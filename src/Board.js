@@ -92,7 +92,8 @@
       for (var i = 0; i < this.attributes.n; i++) {
         result += this.hasRowConflictAt(i);
       }
-      return result !== 0; 
+      return result !== 0;
+      // return false;
     },
 
 
@@ -128,6 +129,7 @@
         result += this.hasColConflictAt(i);
       }
       return result !== 0; 
+      
     },
 
 
@@ -137,6 +139,7 @@
     //
     // test if a specific major diagonal on this board contains a conflict
     hasMajorDiagonalConflictAt: function (majorDiagonalColumnIndexAtFirstRow) {
+      debugger;
       var rows = this.rows();
       var linearRows = [];
       for (var i = 0; i < rows.length; i++) {
@@ -147,6 +150,7 @@
         result += linearRows[i];
       }
       return result > 1;
+   
     },
 
     // test if any major diagonals on this board contain conflicts
@@ -168,20 +172,34 @@
     //
     // test if a specific minor diagonal on this board contains a conflict
     hasMinorDiagonalConflictAt: function (minorDiagonalColumnIndexAtFirstRow) {
-      var newBrd = new Board(this.rows());
+      // debugger;
+      var rows = this.rows();
+      var copyRows = []
+      for (var i = 0; i < rows.length; i++) {
+        copyRows.push(  rows[i].slice() );
+      }
+      var newBrd = new Board(copyRows);
+      // var newBrd = new Board(rows);
       for (var i = 0; i < newBrd.rows().length; i++) {
         newBrd.rows()[i].reverse();
       }
-      return this.hasMajorDiagonalConflictAt(minorDiagonalColumnIndexAtFirstRow + 1 - newBrd.rows().length); // fixme
+      // debugger;
+      return newBrd.hasMajorDiagonalConflictAt(minorDiagonalColumnIndexAtFirstRow + 1 - newBrd.rows().length); // fixme
     },
 
     // test if any minor diagonals on this board contain conflicts
     hasAnyMinorDiagonalConflicts: function () {
-      var newBrd = new Board(this.rows());
+      var rows = this.rows();
+      var copyRows = []
+      for (var i = 0; i < rows.length; i++) {
+        copyRows.push(  rows[i].slice() );
+      }
+      var newBrd = new Board(copyRows);
+      // var newBrd = new Board(rows);
       for (var i = 0; i < newBrd.rows().length; i++) {
         newBrd.rows()[i].reverse();
       }
-      return this.hasAnyMajorDiagonalConflicts();
+      return newBrd.hasAnyMajorDiagonalConflicts();
     }
 
     /*--------------------  End of Helper Functions  ---------------------*/
