@@ -18,9 +18,9 @@
 window.findNRooksSolution = function(n) {
   var deepCopy = function(originBoard) {
     var rows = originBoard.rows();
-    var copyRows = []
+    var copyRows = [];
     for (var i = 0; i < rows.length; i++) {
-      copyRows.push(  rows[i].slice() );
+      copyRows.push( rows[i].slice() );
     }
     var newBoard = new Board(copyRows);
     return newBoard;
@@ -37,9 +37,14 @@ window.findNRooksSolution = function(n) {
         for (var i = row; i < currentBoard.rows().length; i++) {
           for (var j = col; j < currentBoard.rows().length; j++) {
             if (currentBoard.rows()[i][j] === 0 && flag) {
+              // currentBoard.togglePiece(i, j);
+              // if (!currentBoard.hasRowConflictAt(i) && !currentBoard.hasColConflictAt(j)) {
+              //   populateTree(piecesLeft - 1, currentBoard, i, j);
+              // }
+              // currentBoard.togglePiece(i, j);
               newBoard = deepCopy(currentBoard);
               newBoard.togglePiece(i, j);
-              if (!newBoard.hasRowConflictAt(i) && !newBoard.hasColConflictAt(j)){
+              if (!newBoard.hasRowConflictAt(i) && !newBoard.hasColConflictAt(j)) {
                 populateTree(piecesLeft - 1, newBoard, i, j);
               }
             }
@@ -48,8 +53,8 @@ window.findNRooksSolution = function(n) {
       }
     }
   };
-  var brd = new Board({n : n});
-  populateTree(n, brd, 0 , 0);
+  var brd = new Board({n: n});
+  populateTree(n, brd, 0, 0);
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(storage[0].rows()));
   return storage[0].rows();
   // return storage;
@@ -57,88 +62,95 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var deepCopy = function(originBoard) {
-    var rows = originBoard.rows();
-    var copyRows = []
-    for (var i = 0; i < rows.length; i++) {
-      copyRows.push(  rows[i].slice() );
-    }
-    var newBoard = new Board(copyRows);
-    return newBoard;
-  };
-
-  var storage = [];
-  // var flag = true;
-  var populateTree = function (piecesLeft, currentBoard, row, col) {
-    if (!currentBoard.hasAnyRowConflicts() && !currentBoard.hasAnyColConflicts()) {
-      if (piecesLeft === 0) {
-        storage.push(currentBoard);
-        flag = false;
-      } else {
-        for (var i = row; i < currentBoard.rows().length; i++) {
-          for (var j = 0; j < currentBoard.rows().length; j++) {
-            if (currentBoard.rows()[i][j] === 0                              ) {
-              newBoard = deepCopy(currentBoard);
-              newBoard.togglePiece(i, j);
-              if (!newBoard.hasRowConflictAt(i) && !newBoard.hasColConflictAt(j)){
-                populateTree(piecesLeft - 1, newBoard, i, j);
-              }
-            }
-          } 
-        }
+  var solCount = 0;
+  var optionsAvail = [];
+  for (var i = 1; i <= n; i++ ) {
+    optionsAvail.push(i);
+  }
+  var populate = function(optionsAvailable) {
+    if (optionsAvailable.length === 0) {
+      solCount++;
+    } else {
+      for (var i = 0; i < optionsAvailable.length; i++) {
+        var arr = optionsAvailable.slice();
+        arr.splice(i,1);
+        populate(arr);
       }
     }
   };
-  var brd = new Board({n : n});
-  populateTree(n, brd , 0, 0);
-  console.log('Number of solutions for ' + n + ' rooks:', storage.length);
-  return storage.length;
+  populate(optionsAvail);
+  console.log('Number of solutions for ' + n + ' rooks:', solCount);
+  return solCount;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var deepCopy = function(originBoard) {
-    var rows = originBoard.rows();
-    var copyRows = []
-    for (var i = 0; i < rows.length; i++) {
-      copyRows.push(  rows[i].slice() );
+  var Arr2Brd = function (Arr) {
+    var newBrd = new Board ( {n: n });
+    for (var i = 0 ; i< Arr.length; i++) {
+      newBrd.togglePiece(i,Arr[i]-1);
     }
-    var newBoard = new Board(copyRows);
-    return newBoard;
+    return newBrd;
   };
-
-  var storage = [];
+  
+  var optionsAvail = [];
+  for (var i = 1; i <= n; i++ ) {
+    optionsAvail.push(i);
+  }
+  var solution = [];
   var flag = true;
-  var populateTree = function (piecesLeft, currentBoard) {
-    if (!currentBoard.hasAnyRowConflicts() && !currentBoard.hasAnyColConflicts()) {
-      if (piecesLeft === 0) {
-        storage.push(currentBoard);
+  var populate = function(optionsAvailable, boardRep) {
+    if (optionsAvailable.length === 0) {
+      var brd = Arr2Brd(boardRep);
+      if (!brd.hasAnyMajorDiagonalConflicts() && !brd.hasAnyMinorDiagonalConflicts()) {
+        solution = brd.rows();
         flag = false;
-      } else {
-        for (var i = 0; i < currentBoard.rows().length; i++) {
-          for (var j = 0; j < currentBoard.rows().length; j++) {
-            if (currentBoard.rows()[i][j] === 0 && flag) {
-              newBoard = deepCopy(currentBoard);
-              newBoard.togglePiece(i, j);
-              if (!newBoard.hasRowConflictAt(i) && !newBoard.hasColConflictAt(j)){
-                populateTree(piecesLeft - 1, newBoard, i, j);
-              }
-            }
-          } 
-        }
+      }
+    } else if (flag) {
+      for (var i = 0; i < optionsAvailable.length; i++) {
+        var copyOptionsAvailable = optionsAvailable.slice();
+        var copyBoardRep = boardRep.slice();
+        copyBoardRep.push(optionsAvailable[i]); 
+        copyOptionsAvailable.splice(i, 1);
+        populate(copyOptionsAvailable, copyBoardRep);
       }
     }
   };
-  var brd = new Board({n : n});
-  populateTree(n, brd);
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(storage[0].rows()));
-  return storage[0].rows();
+  populate(optionsAvail, []);
+
+  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  return solution;
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solCount = 0;
+  // var Arr2Brd = function (Arr) {
+  //   var newBrd = new Board ( {n: Arr.length });
+  //   for (var i = 0 ; i< Arr.length; i++) {
+  //     newBrd.togglePiece(i,Arr[i]-1);
+  //   }
+  //   return newBrd;
+  // };
+  // var solCount = 0;
+  // var optionsAvail = [];
+  // for (var i = 1; i <= n; i++ ) {
+  //   optionsAvail.push(i);
+  // }
+  // var populate = function(optionsAvailable) {
+  //   if (optionsAvailable.length === 0) {
+  //     var brd = Arr2Brd()
+  //     solCount++;
+  //   } else {
+  //     for (var i = 0; i < optionsAvailable.length; i++) {
+  //       var arr = optionsAvailable.slice();
+  //       arr.splice(i,1);
+  //       populate(arr);
+  //     }
+  //   }
+  // };
+  // populate(optionsAvail);
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
-  return solutionCount;
+  console.log('Number of solutions for ' + n + ' queens:', solCount);
+  return solCount;
 };
