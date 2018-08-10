@@ -129,14 +129,79 @@ window.findNQueensSolution = function (n) {
   return solution;
 };
 
+
+
+// window.countNQueensSolutions = function (n) {
+//   var solCount = 0;
+
+//   var storeDiagOptions = function (obj, board, i) {
+//     if (board.indexOf(i + 1) === -1 && i < n-1 && obj.available.indexOf(i + 1) === -1) {
+//       obj.diag.push(i + 1);
+//       obj.available.splice(i + 1, 1);
+//     }
+//     if (board.indexOf(i - 1) === -1 && i > 1 && obj.available.indexOf(i - 1) === -1) {
+//       obj.diag.push(i - 1);
+//       obj.available.splice(i - 1, 1);
+//     }
+//   };
+
+//   var restoreDiagOptions = function (obj) {
+//     obj.available.concat(obj.diag);
+//     obj.diag = [];
+//   };
+
+//   if (n === 0) {
+//     solCount = 1;
+//     console.log('Number of solutions for ' + n + ' queens:', solCount);
+//     return solCount;
+//   }
+
+//   var Arr2Brd = function (Arr) {
+//     var newBrd = new Board({ n: n });
+//     for (var i = 0; i < Arr.length; i++) {
+//       newBrd.togglePiece(i, Arr[i] - 1);
+//     }
+//     return newBrd;
+//   };
+
+//   var optionsInit = {
+//     available: [],
+//     diag: []
+//   };
+
+//   for (var i = 1; i <= n; i++) {
+//     optionsInit.available.push(i);
+//   }
+//   var populate = function (options, boardRep) {
+//     debugger;
+//     restoreDiagOptions(options);
+//     if (options.available.length === 0) {
+//       var brd = Arr2Brd(boardRep);
+//       if (!brd.hasAnyMajorDiagonalConflicts() && !brd.hasAnyMinorDiagonalConflicts()) {
+//         solCount++;
+//       }
+//     } else {
+//       for (var i = 0; i < options.available.length; i++) {
+//         var copyOptions = JSON.parse(JSON.stringify(options));
+//         var copyBoardRep = boardRep.slice();
+//         copyBoardRep.push(options.available[i]);
+//         debugger;
+//         copyOptions.available.splice(i, 1);
+//         storeDiagOptions(copyOptions, copyBoardRep, i);
+//         populate(copyOptions, copyBoardRep);
+//       }
+//     }
+//   };
+//   populate(optionsInit, []);
+
+//   console.log('Number of solutions for ' + n + ' queens:', solCount);
+//   return solCount;
+// };
+
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function (n) {
   var solCount = 0;
-  if (n === 2 || n === 3) {
-    solCount = 0;
-    console.log('Number of solutions for ' + n + ' queens:', solCount);
-    return solCount;
-  } 
+
   if (n === 0) {
     solCount = 1;
     console.log('Number of solutions for ' + n + ' queens:', solCount);
@@ -155,24 +220,24 @@ window.countNQueensSolutions = function (n) {
   for (var i = 1; i <= n; i++) {
     optionsAvail.push(i);
   }
-  var flag = true;
   var populate = function (optionsAvailable, boardRep) {
     if (optionsAvailable.length === 0) {
       var brd = Arr2Brd(boardRep);
       if (!brd.hasAnyMajorDiagonalConflicts() && !brd.hasAnyMinorDiagonalConflicts()) {
         solCount++;
       }
-    } else if (flag) {
-      for (var i = 0; i < optionsAvailable.length; i++) {
+    } else {
+      for (var i = 0; i < optionsAvailable.length; i++   ) {
         var copyOptionsAvailable = optionsAvailable.slice();
         var copyBoardRep = boardRep.slice();
         copyBoardRep.push(optionsAvailable[i]);
         copyOptionsAvailable.splice(i, 1);
-        populate(copyOptionsAvailable, copyBoardRep);
+
+        populate(copyOptionsAvailable, copyBoardRep  );
       }
     }
   };
-  populate(optionsAvail, []);
+  populate(optionsAvail, []  );
 
   console.log('Number of solutions for ' + n + ' queens:', solCount);
   return solCount;
